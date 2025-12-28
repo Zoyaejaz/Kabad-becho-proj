@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Calendar, Clock, Upload, Phone, CheckCircle, Sparkles, ArrowRight, Truck, X } from 'lucide-react';
 
-// Added isOpen and onClose props
 const BookPickup = ({ isOpen, onClose }) => {
   const location = useLocation();
   const [formData, setFormData] = useState({
@@ -30,7 +29,6 @@ const BookPickup = ({ isOpen, onClose }) => {
     }
   }, [location]);
 
-  // Prevent background scrolling when popup is active
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -67,12 +65,6 @@ const BookPickup = ({ isOpen, onClose }) => {
     });
   };
 
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
-    }
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     if (formData.scrapType.length === 0) {
@@ -80,21 +72,20 @@ const BookPickup = ({ isOpen, onClose }) => {
       return;
     }
     alert("Pickup scheduled successfully!");
-    onClose(); // Close popup on success
+    onClose();
   };
 
   return (
-    // Outer Wrapper: Fixed and centered
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
       
       {/* Background Blur Overlay */}
       <div 
-        className="absolute inset-0 bg-black/40 backdrop-blur-md animate-fadeIn transition-opacity" 
-        onClick={onClose} // Close when clicking outside
+        className="absolute inset-0 bg-black/40 backdrop-blur-md animate-fadeIn" 
+        onClick={onClose} 
       />
 
-      {/* Popup Container */}
-      <div className="relative z-10 w-full max-w-6xl max-h-[90vh] bg-[#F9FAFB] rounded-[2.5rem] shadow-2xl overflow-y-auto animate-zoomIn">
+      {/* Popup Container - Reduced max-w to 4xl to keep it elegant when full-width */}
+      <div className="relative z-10 w-full max-w-4xl max-h-[90vh] bg-[#F9FAFB] rounded-[2.5rem] shadow-2xl overflow-y-auto animate-zoomIn">
         
         {/* Close Button */}
         <button 
@@ -118,10 +109,10 @@ const BookPickup = ({ isOpen, onClose }) => {
         </section>
 
         <div className="px-6 md:px-12 pb-16">
-          <div className="grid lg:grid-cols-12 gap-8 items-start">
+          {/* Changed grid layout to 1 column so form fills the space */}
+          <div className="max-w-4xl mx-auto">
             
-            {/* Main Form */}
-            <div className="lg:col-span-8 bg-white rounded-3xl border border-gray-100 p-6 md:p-10 shadow-sm">
+            <div className="bg-white rounded-3xl border border-gray-100 p-6 md:p-10 shadow-sm">
               <form onSubmit={handleSubmit} className="space-y-10">
                 
                 {/* Section 1: Contact Details */}
@@ -148,13 +139,13 @@ const BookPickup = ({ isOpen, onClose }) => {
                   </div>
                 </div>
 
-                {/* Section 2: Scrap Categories (3 per line) */}
+                {/* Section 2: Categories */}
                 <div className="space-y-6">
                   <h3 className="text-xl font-bold text-[#5D4037] flex items-center gap-3">
                     <span className="w-7 h-7 rounded-full bg-[#66BB6A] text-white flex items-center justify-center text-xs font-bold">2</span>
                     Select Categories
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {scrapTypes.map((type) => {
                       const isSelected = formData.scrapType.includes(type.id);
                       return (
@@ -162,12 +153,12 @@ const BookPickup = ({ isOpen, onClose }) => {
                           key={type.id}
                           type="button"
                           onClick={() => toggleScrapType(type.id)}
-                          className={`relative p-4 rounded-xl border-2 transition-all flex flex-col items-center text-center ${isSelected ? 'border-[#66BB6A] bg-[#F1F8E9]' : 'border-gray-100 bg-gray-50'}`}
+                          className={`relative p-5 rounded-xl border-2 transition-all flex flex-col items-center text-center ${isSelected ? 'border-[#66BB6A] bg-[#F1F8E9]' : 'border-gray-100 bg-gray-50 hover:bg-white'}`}
                         >
                           <div className={`absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center ${isSelected ? 'bg-[#66BB6A]' : 'bg-gray-200'}`}>
                             {isSelected && <CheckCircle size={12} className="text-white" />}
                           </div>
-                          <span className="text-3xl mb-1">{type.icon}</span>
+                          <span className="text-4xl mb-2">{type.icon}</span>
                           <span className="text-sm font-bold text-[#5D4037]">{type.label}</span>
                         </button>
                       );
@@ -179,7 +170,7 @@ const BookPickup = ({ isOpen, onClose }) => {
                 <div className="space-y-6">
                   <h3 className="text-xl font-bold text-[#5D4037] flex items-center gap-3">
                     <span className="w-7 h-7 rounded-full bg-[#66BB6A] text-white flex items-center justify-center text-xs font-bold">3</span>
-                    Schedule
+                    Schedule Pickup
                   </h3>
                   <div className="grid md:grid-cols-2 gap-4">
                     <input type="date" name="date" onChange={handleInputChange} className="w-full px-5 py-3 rounded-xl bg-gray-50 border border-gray-200 outline-none" required />
@@ -191,22 +182,10 @@ const BookPickup = ({ isOpen, onClose }) => {
                   </div>
                 </div>
 
-                <button type="submit" className="w-full py-4 bg-[#66BB6A] text-white rounded-xl font-bold text-lg hover:bg-[#4CAF50] transition-all flex items-center justify-center gap-2">
+                <button type="submit" className="w-full py-4 bg-[#66BB6A] text-white rounded-xl font-bold text-lg hover:bg-[#4CAF50] transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-200">
                   Confirm Booking <ArrowRight size={20} />
                 </button>
               </form>
-            </div>
-
-            {/* Sidebar Info */}
-            <div className="lg:col-span-4 space-y-6">
-              <div className="bg-[#5D4037] text-white p-6 rounded-3xl shadow-xl">
-                <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Sparkles className="text-[#66BB6A]" /> Guaranteed</h3>
-                <ul className="space-y-3 text-sm opacity-90">
-                  <li className="flex items-center gap-2"><CheckCircle size={16} className="text-[#66BB6A]" /> Best Rates Guaranteed</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={16} className="text-[#66BB6A]" /> Instant Cash Payment</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={16} className="text-[#66BB6A]" /> Digital Weighing</li>
-                </ul>
-              </div>
             </div>
           </div>
         </div>
