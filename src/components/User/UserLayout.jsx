@@ -37,11 +37,18 @@ const UserLayout = () => {
 
         <div className="ml-auto flex gap-4 items-center">
           <button
+            onClick={() => navigate('/book-pickup')}
+            className="px-6 py-2 bg-[#66BB6A] text-white font-semibold rounded-full hover:bg-[#4CAF50] transition-all duration-300 shadow-md flex items-center justify-center"
+          >
+            Book pickup
+          </button>
+          <button
             onClick={handleLogout}
             className="flex gap-2 px-4 py-2 bg-[#5D4037] text-white rounded-lg hover:bg-[#4E362E]"
           >
             <LogOut size={18} /> Logout
           </button>
+          
         </div>
       </header>
 

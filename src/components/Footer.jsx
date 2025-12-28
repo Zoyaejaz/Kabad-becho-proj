@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Phone, 
   Mail, 
@@ -19,11 +20,18 @@ const KabadBechoFooter = () => {
   const currentYear = new Date().getFullYear();
 
   const quickLinks = [
-    'About Us',
-    'Services',
-    'Contact Us'
-    
-  ];
+  { name: 'About Us', href: '/about' },
+  { name: 'Services', href: '/services' },
+  { name: 'Contact Us', href: '/contact' }
+];
+
+const services = [
+  { name: 'Metal Scrap',  },
+  { name: 'Paper Scrap', },
+  { name: 'E-Waste Scrap',  },
+  { name: 'Plastic Scrap' },
+  { name: 'Glass Scrap' }
+];
 
  
 
@@ -76,24 +84,46 @@ const KabadBechoFooter = () => {
 
             {/* Quick Links */}
             <div>
-              <h4 className="font-bold text-lg mb-6 text-[#66BB6A] flex items-center">
-                <Recycle size={20} className="mr-2" />
-                Quick Links
-              </h4>
-              <ul className="space-y-3">
-                {quickLinks.map((link, idx) => (
-                  <li key={idx}>
-                    <button className="group flex items-center text-amber-100 hover:text-[#66BB6A] transition-colors duration-300">
-                      <ChevronRight size={16} className="mr-2 group-hover:translate-x-1 transition-transform duration-300" />
-                      <span>{link}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
+      <h4 className="font-bold text-lg mb-6 text-[#66BB6A] flex items-center">
+        <Recycle size={20} className="mr-2" />
+        Quick Links
+      </h4>
+      <ul className="space-y-3">
+        {quickLinks.map((link, idx) => (
+          <li key={idx}>
+            <Link 
+              to={link.href} 
+              className="group flex items-center text-amber-100 hover:text-[#66BB6A] transition-colors duration-300 cursor-pointer"
+            >
+              <ChevronRight 
+                size={16} 
+                className="mr-2 group-hover:translate-x-1 transition-transform duration-300" 
+              />
+              {/* Use link.name here to display the text */}
+              <span>{link.name}</span>
+            </Link>
+          </li>
+          ))}
+        </ul>
+      </div>
 
             {/* Services */}
-            
+            <div>
+    <h4 className="font-bold text-lg mb-6 text-[#66BB6A] flex items-center">
+      <Send size={20} className="mr-2" />
+      Our Services
+    </h4>
+    <ul className="space-y-3">
+      {services.map((service, idx) => (
+        <li key={idx}>
+          <Link to={service.href} className="group flex items-center text-amber-100 hover:text-[#66BB6A] transition-all duration-300">
+            <ChevronRight size={16} className="mr-2 group-hover:translate-x-1 transition-transform" />
+            <span>{service.name}</span>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  </div>
 
             {/* Contact Info */}
             <div>

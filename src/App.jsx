@@ -14,6 +14,7 @@ import Pickup from "./components/User/pickup.jsx";
 import Setting from "./components/User/Setting.jsx";
 import UserService from "./components/User/UserService.jsx"
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import Contact from "./pages/Contact.jsx";
 
 // Admin
 import AdminLayout from "./components/admin/AdminLayout.jsx";
@@ -34,6 +35,7 @@ const App = () => {
         <Route path="/" element={<><Navbar /><Home /></>} />
         <Route path="/services" element={<><Navbar /><Services /></>} />
         <Route path="/about" element={<><Navbar /><AboutUs /></>} />
+        <Route path="/contact" element={<><Navbar /><Contact /></>} />
         <Route path="/login" element={<><Navbar /><Login /></>} />
         <Route path="/Kabadi" element={<Kabadi/>}></Route>
         <Route path="/book-pickup" element={<><Navbar /><BookPickup /></>} />
@@ -45,6 +47,7 @@ const App = () => {
   <Route path="pickup" element={<Pickup />} />
   <Route path="UserService" element={<UserService/>} />
   <Route path="setting" element={<Setting />} />
+  <Route path="book-pickup" element={<BookPickup/>} />
 </Route>
 
 

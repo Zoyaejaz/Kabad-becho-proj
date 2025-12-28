@@ -54,6 +54,7 @@ const Navbar = () => {
   const getPath = (item) => {
     if (item === 'Home') return '/';
     if (item === 'About Us') return '/about';
+    if (item === 'Contact Us') return '/contact';
     return `/${item.toLowerCase()}`;
   };
 
@@ -90,7 +91,7 @@ const Navbar = () => {
 
             {/* Desktop Menu */}
             <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center space-x-2">
-              {['Home', 'About Us', 'Services'].map((item) => (
+              {['Home', 'About Us', 'Services','Contact Us'].map((item) => (
                 <Link
                   key={item}
                   to={getPath(item)}
@@ -119,10 +120,10 @@ const Navbar = () => {
                   </button>
                   <button
                     onClick={() => {
-                      setAuthRedirectPath('/book-pickup');
+                      setAuthRedirectPath('/dashboard');
                       setIsAuthModalOpen(true);
                     }}
-                    className="px-6 py-2 bg-[#66BB6A] text-white font-semibold rounded-full hover:bg-[#4CAF50] transition-all duration-300 shadow-md flex items-center justify-center"
+                    className="px-6 py-2 bg-[#66BB6A] text-white font-semibold rounded-full hover:bg-[#4CAF50] transition-al\l duration-300 shadow-md flex items-center justify-center"
                   >
                     Book pickup
                   </button>
@@ -196,7 +197,7 @@ const Navbar = () => {
           {/* Mobile Menu */}
           <div className={`lg:hidden overflow-hidden transition-all duration-500 ${isMenuOpen ? 'max-h-[500px] opacity-100 mt-6' : 'max-h-0 opacity-0'}`}>
             <div className="pb-4 space-y-2">
-              {['Home', 'About Us', 'Services'].map((item) => (
+              {['Home', 'About Us', 'Services','Contact Us'].map((item) => (
                 <Link
                   key={item}
                   to={getPath(item)}

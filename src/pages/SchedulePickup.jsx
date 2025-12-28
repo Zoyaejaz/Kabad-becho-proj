@@ -206,52 +206,7 @@ const SchedulePickup = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 bg-linear-to-br from-[#F1F8E9] to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-[#5D4037] mb-4">
-              How It <span className="text-[#66BB6A]">Works</span>
-            </h2>
-            <p className="text-xl text-gray-600">Simple 3-step process to recycle your scrap</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                step: '01',
-                icon: <Calendar size={40} />,
-                title: 'Schedule Pickup',
-                description: 'Fill the form above and choose your preferred date and time'
-              },
-              {
-                step: '02',
-                icon: <Package size={40} />,
-                title: 'We Collect & Weigh',
-                description: 'Our team arrives, weighs your scrap with digital scales'
-              },
-              {
-                step: '03',
-                icon: <CheckCircle size={40} />,
-                title: 'Get Instant Payment',
-                description: 'Receive immediate payment via cash, UPI, or bank transfer'
-              }
-            ].map((step, idx) => (
-              <div key={idx} className="relative">
-                <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 hover:border-[#66BB6A] transition-all duration-300">
-                  <div className="absolute -top-6 left-8 bg-[#66BB6A] text-white text-2xl font-black w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
-                    {idx + 1}
-                  </div>
-                  <div className="mt-4 mb-6 text-[#66BB6A]">
-                    {step.icon}
-                  </div>
-                  <h3 className="text-2xl font-bold text-[#5D4037] mb-3">{step.title}</h3>
-                  <p className="text-gray-600 leading-relaxed">{step.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      
 
       {/* Footer */}
       <Footer />
