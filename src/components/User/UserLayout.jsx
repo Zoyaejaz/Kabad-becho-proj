@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { Link, useLocation, Outlet, useNavigate } from "react-router-dom";
 import { LayoutDashboard, History, Wallet, User, LogOut, X, Menu } from "lucide-react";
+import BookPickup from '../../pages/BookPickup';
 
 const UserLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isBookOpen, setIsBookOpen] = useState(false);
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Overview", path: "/dashboard" },
@@ -37,7 +39,7 @@ const UserLayout = () => {
 
         <div className="ml-auto flex gap-4 items-center">
           <button
-            onClick={() => navigate('/book-pickup')}
+            onClick={() => setIsBookOpen(true)}
             className="px-6 py-2 bg-[#66BB6A] text-white font-semibold rounded-full hover:bg-[#4CAF50] transition-all duration-300 shadow-md flex items-center justify-center"
           >
             Book pickup
@@ -89,6 +91,7 @@ const UserLayout = () => {
           <Outlet />
         </div>
       </main>
+      <BookPickup isOpen={isBookOpen} onClose={() => setIsBookOpen(false)} />
       
     </div>
   );

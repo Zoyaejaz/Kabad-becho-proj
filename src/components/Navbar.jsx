@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X, User, LogOut, ChevronDown } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import AuthModal from './AuthModal';
+import BookPickup from '../pages/BookPickup';
 
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isBookOpen, setIsBookOpen] = useState(false);
   const [authRedirectPath, setAuthRedirectPath] = useState('/dashboard');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -130,12 +132,12 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
-                  <Link
-                    to="/book-pickup"
+                  <button
+                    onClick={() => setIsBookOpen(true)}
                     className="px-6 py-2 bg-[#66BB6A] text-white font-semibold rounded-full hover:bg-[#4CAF50] transition-all duration-300 shadow-md flex items-center justify-center"
                   >
                     Book pickup
-                  </Link>
+                  </button>
                   
                   {/* Profile Dropdown */}
                   <div className="relative profile-menu-container">
@@ -249,13 +251,12 @@ const Navbar = () => {
                         </div>
                       </div>
                     </div>
-                    <Link
-                      to="/book-pickup"
-                      onClick={() => setIsMenuOpen(false)}
+                    <button
+                      onClick={() => { setIsMenuOpen(false); setIsBookOpen(true); }}
                       className="w-full block text-center px-4 py-3 bg-[#66BB6A] text-white font-semibold rounded-lg hover:bg-[#5CA960] transition-colors"
                     >
                       Book pickup
-                    </Link>
+                    </button>
                     <Link
                       to="/dashboard"
                       onClick={() => setIsMenuOpen(false)}
@@ -285,6 +286,8 @@ const Navbar = () => {
         onClose={() => setIsAuthModalOpen(false)} 
         redirectPath={authRedirectPath}
       />
+
+      <BookPickup isOpen={isBookOpen} onClose={() => setIsBookOpen(false)} />
 
       <style>{`
         @keyframes fadeIn {

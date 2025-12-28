@@ -38,7 +38,7 @@ const App = () => {
         <Route path="/contact" element={<><Navbar /><Contact /></>} />
         <Route path="/login" element={<><Navbar /><Login /></>} />
         <Route path="/Kabadi" element={<Kabadi/>}></Route>
-        <Route path="/book-pickup" element={<><Navbar /><BookPickup /></>} />
+        <Route path="/book-pickup" element={<><BookPickup /></>} />
         <Route path="/schedule-pickup" element={<><SchedulePickup /></>} />
 
         {/* USER DASHBOARD (nested) */}

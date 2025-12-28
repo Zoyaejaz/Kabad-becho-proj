@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation,useNavigate } from 'react-router-dom';
-import { Calendar, Clock, Upload, MapPin, Phone, Mail, User, Weight, CheckCircle, Send, Sparkles, ArrowRight, Truck } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
+import { Calendar, Clock, Upload, Phone, CheckCircle, Sparkles, ArrowRight, Truck, X } from 'lucide-react';
 
-
-const BookPickup = () => {
+// Added isOpen and onClose props
+const BookPickup = ({ isOpen, onClose }) => {
   const location = useLocation();
   const [formData, setFormData] = useState({
     name: '',
@@ -11,30 +11,60 @@ const BookPickup = () => {
     email: '',
     address: '',
     weight: '',
-    scrapType: '',
+    scrapType: [],
     date: '',
     time: '',
     notes: ''
   });
 
+  const [selectedFile, setSelectedFile] = useState(null);
+
   useEffect(() => {
     if (location.state && location.state.scrapType) {
-      setFormData(prev => ({ ...prev, scrapType: location.state.scrapType }));
+      setFormData(prev => ({ 
+        ...prev, 
+        scrapType: Array.isArray(location.state.scrapType) 
+          ? location.state.scrapType 
+          : [location.state.scrapType] 
+      }));
     }
   }, [location]);
 
-  const [selectedFile, setSelectedFile] = useState(null);
+  // Prevent background scrolling when popup is active
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
 
   const scrapTypes = [
-    { id: 'wood', label: 'Wood/Paper', icon: '🪵', desc: 'Furniture, logs, newspapers' },
-    { id: 'plastic', label: 'Plastic', icon: '🥤', desc: 'Bottles, containers' },
-    { id: 'metal', label: 'Metal', icon: '🔩', desc: 'Iron, aluminum, copper' },
-    { id: 'mixed', label: 'E-Waste/Mixed', icon: '🗑️', desc: 'Electronics, combination' }
+    { id: 'paper', label: 'Paper', icon: '📄', desc: 'Newspapers, Cardboard' },
+    { id: 'plastic', label: 'Plastic', icon: '🥤', desc: 'Bottles, Containers' },
+    { id: 'metal', label: 'Metal', icon: '🔩', desc: 'Iron, Copper, Aluminum' },
+    { id: 'wood', label: 'Wood', icon: '🪵', desc: 'Furniture, Crates' },
+    { id: 'E-Waste', label: 'E-Waste', icon: '💻', desc: 'Electronics, Gadgets' },
+    { id: 'mixed', label: 'Mixed', icon: '🗃️', desc: 'Other / Combined' },
   ];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const toggleScrapType = (id) => {
+    setFormData(prev => {
+      const isSelected = prev.scrapType.includes(id);
+      return {
+        ...prev,
+        scrapType: isSelected
+          ? prev.scrapType.filter(item => item !== id)
+          : [...prev.scrapType, id]
+      };
+    });
   };
 
   const handleFileChange = (e) => {
@@ -45,278 +75,148 @@ const BookPickup = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form Submitted:', { ...formData, selectedFile });
-    alert("Pickup scheduled successfully! (Demo)");
+    if (formData.scrapType.length === 0) {
+      alert("Please select at least one scrap category.");
+      return;
+    }
+    alert("Pickup scheduled successfully!");
+    onClose(); // Close popup on success
   };
 
   return (
-    <div className="relative min-h-screen bg-[#F9FAFB] overflow-hidden">
+    // Outer Wrapper: Fixed and centered
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      
+      {/* Background Blur Overlay */}
+      <div 
+        className="absolute inset-0 bg-black/40 backdrop-blur-md animate-fadeIn transition-opacity" 
+        onClick={onClose} // Close when clicking outside
+      />
 
-      {/* Background Blobs (Subtler for Uniformity) */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
-        <div className="absolute top-0 left-0 w-125 h-125 bg-[#66BB6A]/20 rounded-full blur-[100px] animate-blob"></div>
-        <div className="absolute top-1/2 right-0 w-125 h-125 bg-[#81C784]/20 rounded-full blur-[100px] animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-0 left-1/4 w-125 h-125 bg-[#A1887F]/10 rounded-full blur-[100px] animate-blob animation-delay-4000"></div>
-      </div>
+      {/* Popup Container */}
+      <div className="relative z-10 w-full max-w-6xl max-h-[90vh] bg-[#F9FAFB] rounded-[2.5rem] shadow-2xl overflow-y-auto animate-zoomIn">
+        
+        {/* Close Button */}
+        <button 
+          onClick={onClose}
+          className="absolute top-6 right-6 p-2 bg-white rounded-full shadow-lg hover:text-red-500 transition-colors z-50"
+        >
+          <X size={24} />
+        </button>
 
-      {/* Header Section (Matching Contact.jsx) */}
-      <section className="pt-32 pb-16 bg-linear-to-b from-white to-[#E8F5E9]/50 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm border border-gray-100 animate-fadeIn mx-auto">
-            <Truck className="text-[#66BB6A]" size={18} />
-            <span className="text-sm font-semibold text-[#5D4037]">DOORSTEP COLLECTION</span>
+        {/* Header Section */}
+        <section className="pt-16 pb-8 bg-linear-to-b from-white to-[#E8F5E9]/50 text-center">
+          <div className="max-w-3xl mx-auto px-4 space-y-3">
+            <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-white shadow-sm border border-gray-100 mx-auto">
+              <Truck className="text-[#66BB6A]" size={16} />
+              <span className="text-xs font-semibold text-[#5D4037]">DOORSTEP COLLECTION</span>
+            </div>
+            <h1 className="text-3xl md:text-5xl font-bold text-[#5D4037]">
+              Schedule Your <span className="text-[#66BB6A]">Pickup</span>
+            </h1>
           </div>
+        </section>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#5D4037] tracking-tight animate-fadeIn animation-delay-200">
-            Schedule Your <span className="text-[#66BB6A]">Pickup</span>
-          </h1>
-
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed animate-fadeIn animation-delay-400">
-            Experience the most seamless scrap collection service. Fast, reliable, and eco-friendly.
-          </p>
-        </div>
-      </section>
-
-      <div className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto -mt-8 pb-20">
-        <div className="grid lg:grid-cols-12 gap-8 items-start">
-
-          {/* Main Form Container (Uniform: Solid White, Rounded-3xl, Shadow-xl) */}
-          <div className="lg:col-span-8 bg-white rounded-3xl shadow-xl border border-gray-100 p-8 md:p-12 animate-fadeInUp">
-            <form onSubmit={handleSubmit} className="space-y-10">
-
-              {/* Section 1: Personal Details */}
-              <div className="space-y-6">
-                <h3 className="text-2xl font-bold text-[#5D4037] flex items-center gap-3 pb-2 border-b border-gray-100">
-                  <span className="w-8 h-8 rounded-full bg-[#66BB6A] text-white flex items-center justify-center text-sm font-bold shadow-md">1</span>
-                  Contact Details
-                </h3>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  {['name', 'phone', 'email', 'weight'].map((field) => (
-                    <div key={field} className="space-y-2">
-                      <label className="text-sm font-semibold text-[#5D4037] ml-1 capitalize">
-                        {field === 'weight' ? (<span>Est. Weight (kg) <span className="text-gray-400 font-normal">(Optional)</span></span>) : field === 'name' ? 'Full Name' : field === 'phone' ? 'Phone Number' : 'Email Address'}
-                      </label>
-                      <input
-                        type={field === 'email' ? 'email' : field === 'weight' ? 'number' : field === 'phone' ? 'tel' : 'text'}
-                        name={field}
-                        value={formData[field]}
-                        onChange={handleInputChange}
-                        placeholder={`Enter your ${field}`}
-                        className="w-full px-5 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#66BB6A] focus:ring-4 focus:ring-[#66BB6A]/10 outline-none transition-all duration-300 font-medium text-[#5D4037] placeholder-gray-400"
-                        required={field !== 'weight'}
-                      />
-                    </div>
-                  ))}
-
-                  <div className="md:col-span-2 space-y-2">
-                    <label className="text-sm font-semibold text-[#5D4037] ml-1">Pickup Address</label>
-                    <textarea
-                      name="address"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      placeholder="Enter full address including text landmark..."
-                      rows="3"
-                      className="w-full px-5 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#66BB6A] focus:ring-4 focus:ring-[#66BB6A]/10 outline-none transition-all duration-300 font-medium text-[#5D4037] placeholder-gray-400 resize-none"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Section 2: Scrap Type */}
-              <div className="space-y-6">
-                <h3 className="text-2xl font-bold text-[#5D4037] flex items-center gap-3 pb-2 border-b border-gray-100">
-                  <span className="w-8 h-8 rounded-full bg-[#66BB6A] text-white flex items-center justify-center text-sm font-bold shadow-md">2</span>
-                  Scrap Category
-                </h3>
-
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {scrapTypes.map((type) => (
-                    <div
-                      key={type.id}
-                      onClick={() => setFormData(prev => ({ ...prev, scrapType: type.id }))}
-                      className={`relative overflow-hidden cursor-pointer rounded-2xl p-4 transition-all duration-300 border-2 ${formData.scrapType === type.id
-                        ? 'border-[#66BB6A] bg-[#E8F5E9] shadow-md transform scale-[1.02]'
-                        : 'border-transparent bg-gray-50 hover:bg-white hover:shadow-lg hover:border-gray-100'
-                        }`}
-                    >
-                      <div className="text-center space-y-2 relative z-10">
-                        <span className="text-4xl filter drop-shadow-sm block mb-2">{type.icon}</span>
-                        <p className={`font-bold text-sm md:text-base ${formData.scrapType === type.id ? 'text-[#66BB6A]' : 'text-[#5D4037]'}`}>
-                          {type.label}
-                        </p>
-                      </div>
-                      {/* Check Icon for Active State */}
-                      {formData.scrapType === type.id && (
-                        <div className="absolute top-2 right-2 text-[#66BB6A]">
-                          <CheckCircle size={16} fill="currentColor" className="text-white" />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Section 3: Schedule & Media */}
-              <div className="space-y-6">
-                <h3 className="text-2xl font-bold text-[#5D4037] flex items-center gap-3 pb-2 border-b border-gray-100">
-                  <span className="w-8 h-8 rounded-full bg-[#66BB6A] text-white flex items-center justify-center text-sm font-bold shadow-md">3</span>
-                  Schedule & Photo
-                </h3>
-
-                <div className="grid md:grid-cols-2 gap-8">
-                  {/* Date & Time */}
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-[#5D4037] ml-1">Preferred Date</label>
-                      <div className="relative">
-                        <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+        <div className="px-6 md:px-12 pb-16">
+          <div className="grid lg:grid-cols-12 gap-8 items-start">
+            
+            {/* Main Form */}
+            <div className="lg:col-span-8 bg-white rounded-3xl border border-gray-100 p-6 md:p-10 shadow-sm">
+              <form onSubmit={handleSubmit} className="space-y-10">
+                
+                {/* Section 1: Contact Details */}
+                <div className="space-y-6">
+                  <h3 className="text-xl font-bold text-[#5D4037] flex items-center gap-3">
+                    <span className="w-7 h-7 rounded-full bg-[#66BB6A] text-white flex items-center justify-center text-xs font-bold">1</span>
+                    Contact Details
+                  </h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {['name', 'phone', 'email', 'weight'].map((field) => (
+                      <div key={field} className="space-y-1">
                         <input
-                          type="date"
-                          name="date"
-                          value={formData.date}
+                          type={field === 'email' ? 'email' : field === 'weight' ? 'number' : 'text'}
+                          name={field}
+                          value={formData[field]}
                           onChange={handleInputChange}
-                          className="w-full pl-12 pr-5 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#66BB6A] focus:ring-4 focus:ring-[#66BB6A]/10 outline-none transition-all duration-300 text-[#5D4037] font-medium"
-                          required
+                          placeholder={field === 'weight' ? "Est. Weight (kg)" : `Your ${field}`}
+                          className="w-full px-5 py-3 rounded-xl bg-gray-50 border border-gray-200 outline-none focus:border-[#66BB6A] transition-all font-medium text-sm"
+                          required={field !== 'weight'}
                         />
                       </div>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-[#5D4037] ml-1">Preferred Time</label>
-                      <div className="relative">
-                        <Clock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                        <select
-                          name="time"
-                          value={formData.time}
-                          onChange={handleInputChange}
-                          className="w-full pl-12 pr-5 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#66BB6A] focus:ring-4 focus:ring-[#66BB6A]/10 outline-none transition-all duration-300 text-[#5D4037] font-medium cursor-pointer appearance-none"
-                          required
-                        >
-                          <option value="">Select Time Slot</option>
-                          <option value="morning">Morning (9 AM - 12 PM)</option>
-                          <option value="afternoon">Afternoon (12 PM - 4 PM)</option>
-                          <option value="evening">Evening (4 PM - 7 PM)</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Upload */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-[#5D4037] ml-1">Upload Photo (Optional)</label>
-                    <div className="relative group h-34">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                      />
-                      <div className="h-full border-2 border-dashed border-gray-300 rounded-xl bg-gray-50/50 flex flex-col items-center justify-center p-4 transition-all duration-300 group-hover:bg-[#E8F5E9] group-hover:border-[#66BB6A]">
-                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm mb-2 text-gray-400 group-hover:text-[#66BB6A] group-hover:scale-110 transition-transform">
-                          <Upload size={20} />
-                        </div>
-                        <p className="font-semibold text-[#5D4037] text-sm text-center">
-                          {selectedFile ? selectedFile.name : "Click to upload image"}
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">Max 5MB (JPG, PNG)</p>
-                      </div>
-                    </div>
+                    ))}
+                    <textarea name="address" placeholder="Full Address" onChange={handleInputChange} rows="2" className="md:col-span-2 w-full px-5 py-3 rounded-xl bg-gray-50 border border-gray-200 outline-none focus:border-[#66BB6A] text-sm" required />
                   </div>
                 </div>
-              </div>
 
-              {/* Action Button */}
-              <div className="pt-4">
-                <button
-                  type="submit"
-                  className="w-full py-4 bg-linear-to-r from-[#66BB6A] to-[#4CAF50] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3"
-                >
-                  Confirm Booking
-                  <ArrowRight size={20} />
+                {/* Section 2: Scrap Categories (3 per line) */}
+                <div className="space-y-6">
+                  <h3 className="text-xl font-bold text-[#5D4037] flex items-center gap-3">
+                    <span className="w-7 h-7 rounded-full bg-[#66BB6A] text-white flex items-center justify-center text-xs font-bold">2</span>
+                    Select Categories
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    {scrapTypes.map((type) => {
+                      const isSelected = formData.scrapType.includes(type.id);
+                      return (
+                        <button
+                          key={type.id}
+                          type="button"
+                          onClick={() => toggleScrapType(type.id)}
+                          className={`relative p-4 rounded-xl border-2 transition-all flex flex-col items-center text-center ${isSelected ? 'border-[#66BB6A] bg-[#F1F8E9]' : 'border-gray-100 bg-gray-50'}`}
+                        >
+                          <div className={`absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center ${isSelected ? 'bg-[#66BB6A]' : 'bg-gray-200'}`}>
+                            {isSelected && <CheckCircle size={12} className="text-white" />}
+                          </div>
+                          <span className="text-3xl mb-1">{type.icon}</span>
+                          <span className="text-sm font-bold text-[#5D4037]">{type.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Section 3: Schedule */}
+                <div className="space-y-6">
+                  <h3 className="text-xl font-bold text-[#5D4037] flex items-center gap-3">
+                    <span className="w-7 h-7 rounded-full bg-[#66BB6A] text-white flex items-center justify-center text-xs font-bold">3</span>
+                    Schedule
+                  </h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <input type="date" name="date" onChange={handleInputChange} className="w-full px-5 py-3 rounded-xl bg-gray-50 border border-gray-200 outline-none" required />
+                    <select name="time" onChange={handleInputChange} className="w-full px-5 py-3 rounded-xl bg-gray-50 border border-gray-200 outline-none" required>
+                      <option value="">Time Slot</option>
+                      <option value="morning">Morning (9-12)</option>
+                      <option value="afternoon">Afternoon (12-4)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button type="submit" className="w-full py-4 bg-[#66BB6A] text-white rounded-xl font-bold text-lg hover:bg-[#4CAF50] transition-all flex items-center justify-center gap-2">
+                  Confirm Booking <ArrowRight size={20} />
                 </button>
-              </div>
-
-            </form>
-          </div>
-
-          {/* Sidebar / Info Panel (Unique but Uniform Styling) */}
-          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-32 animate-fadeInRight">
-            {/* Trust Card */}
-            <div className="bg-[#5D4037] text-white p-8 rounded-3xl shadow-xl relative overflow-hidden group">
-              {/* Decorative Circle */}
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
-
-              <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <Sparkles className="text-[#66BB6A]" />
-                Why Kabad Becho?
-              </h3>
-              <ul className="space-y-5">
-                {[
-                  'Best Rates Guaranteed',
-                  'Instant Cash Payment',
-                  'Digital Weighing Scale',
-                  'Verified Pickup Staff'
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-white/90 font-medium">
-                    <div className="w-6 h-6 rounded-full bg-[#66BB6A]/20 flex items-center justify-center">
-                      <CheckCircle size={14} className="text-[#66BB6A]" />
-                    </div>
-                    {item}
-                  </li>
-                ))}
-              </ul>
+              </form>
             </div>
 
-            {/* Support Card */}
-            <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 text-center">
-              <div className="w-14 h-14 bg-[#E8F5E9] rounded-full flex items-center justify-center mx-auto mb-4 text-[#66BB6A]">
-                <Phone size={24} />
+            {/* Sidebar Info */}
+            <div className="lg:col-span-4 space-y-6">
+              <div className="bg-[#5D4037] text-white p-6 rounded-3xl shadow-xl">
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Sparkles className="text-[#66BB6A]" /> Guaranteed</h3>
+                <ul className="space-y-3 text-sm opacity-90">
+                  <li className="flex items-center gap-2"><CheckCircle size={16} className="text-[#66BB6A]" /> Best Rates Guaranteed</li>
+                  <li className="flex items-center gap-2"><CheckCircle size={16} className="text-[#66BB6A]" /> Instant Cash Payment</li>
+                  <li className="flex items-center gap-2"><CheckCircle size={16} className="text-[#66BB6A]" /> Digital Weighing</li>
+                </ul>
               </div>
-              <h3 className="text-xl font-bold text-[#5D4037] mb-2">Need Assistance?</h3>
-              <p className="text-gray-600 text-sm mb-4">Our support team is available from 9 AM to 8 PM to assist you.</p>
-              <a href="tel:+919876543210" className="text-lg font-bold text-[#66BB6A] hover:underline">
-                +91 98765 43210
-              </a>
             </div>
           </div>
-
         </div>
       </div>
 
       <style>{`
-        @keyframes blob {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-          100% { transform: translate(0px, 0px) scale(1); }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(40px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeInRight {
-          from { opacity: 0; transform: translateX(20px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        .animate-fadeIn { animation: fadeIn 0.8s ease-out forwards; }
-        .animate-fadeInUp { animation: fadeInUp 0.8s ease-out forwards; }
-        .animate-fadeInRight { animation: fadeInRight 0.8s ease-out forwards; }
-        .animation-delay-200 { animation-delay: 0.2s; }
-        .animation-delay-400 { animation-delay: 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+        .animate-zoomIn { animation: zoomIn 0.3s ease-out; }
       `}</style>
     </div>
   );
